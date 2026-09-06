@@ -1,0 +1,2683 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PKKMB 2026 — Prodi Teknologi Rekayasa Multimedia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --gold:        #bc9601;
+    --gold-bright: #d4ac02;
+    --gold-muted:  #9a7c01;
+    --gold-pale:   #f5ecda;
+
+    --dark:        #0f0d02;
+    --dark-2:      #1a1803;
+    --dark-3:      #252310;
+    --dark-border: rgba(188,150,1,0.2);
+
+    --white:       #ffffff;
+    --off-white:   #fdfaf2;
+
+    --font-heading: 'Lato', sans-serif;
+    --font-body:    'Inter', sans-serif;
+
+    --deck-w: 1280px;
+    --deck-h: 720px;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{
+    height:100%;
+    background:#000;
+    overflow:hidden;
+    font-family:var(--font-body);
+  }
+
+  /* ============ STAGE — centers & scales the 16:9 deck ============ */
+  .stage{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#000;
+  }
+
+  .deck{
+    position:relative;
+    width:var(--deck-w);
+    height:var(--deck-h);
+    background:var(--dark);
+    overflow:hidden;
+    box-shadow:0 30px 100px rgba(0,0,0,0.7);
+    flex-shrink:0;
+  }
+
+  /* ============ SLIDES ============ */
+  .slides{ position:relative; width:100%; height:100%; }
+
+  .slide{
+    position:absolute;
+    inset:0;
+    display:none;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+  }
+
+  .slide.active{ display:block; }
+
+  .gold{ color:var(--gold); }
+
+  /* ============ DECK NAV — small numbered boxes ============ */
+  .deck-nav{
+    position:absolute;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%);
+    display:flex;
+    gap:8px;
+    z-index:500;
+  }
+
+  .nav-box{
+    width:30px;
+    height:30px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1.5px solid rgba(188,150,1,0.35);
+    border-radius:6px;
+    background:rgba(255,255,255,0.04);
+    backdrop-filter:blur(4px);
+    color:rgba(255,255,255,0.5);
+    font-family:var(--font-body);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    user-select:none;
+    transition:all .2s ease;
+  }
+
+  .nav-box:hover{
+    border-color:var(--gold);
+    color:var(--white);
+    background:rgba(188,150,1,0.12);
+  }
+
+  .nav-box.active{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:var(--dark);
+    box-shadow:0 0 14px rgba(188,150,1,0.55);
+  }
+
+  /* ============================================================
+     SLIDE 1 — JUDUL
+     ============================================================ */
+  .slide-title{
+    background:var(--dark);
+  }
+
+  .slide-title::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse 900px 700px at 88% 8%,  rgba(188,150,1,0.22) 0%, transparent 55%),
+      radial-gradient(ellipse 700px 600px at 8% 96%,   rgba(188,150,1,0.10) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .slide-title::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 26px 26px;
+    mask-image: radial-gradient(ellipse 700px 500px at 78% 30%, black 0%, transparent 70%);
+    pointer-events:none;
+  }
+
+  /* watermark angka besar di kanan */
+  .title-watermark{
+    position:absolute;
+    right:-60px;
+    top:50%;
+    transform:translateY(-50%);
+    font-family:var(--font-heading);
+    font-size:520px;
+    font-weight:900;
+    line-height:1;
+    color:transparent;
+    -webkit-text-stroke:1.5px rgba(188,150,1,0.16);
+    letter-spacing:-10px;
+    z-index:1;
+    pointer-events:none;
+    user-select:none;
+  }
+
+  .title-topbar{
+    position:absolute;
+    top:44px;
+    left:64px;
+    right:64px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    z-index:5;
+  }
+
+  .title-logo-img{
+    height:52px;
+    width:auto;
+    display:block;
+  }
+
+  .title-eyebrow-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--gold);
+    background:rgba(188,150,1,0.1);
+    border:1px solid rgba(188,150,1,0.35);
+    padding:7px 16px;
+    border-radius:100px;
+  }
+
+  .title-eyebrow-pill .dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 8px rgba(188,150,1,0.7);
+  }
+
+  .title-main{
+    position:relative;
+    z-index:5;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:0 64px;
+    max-width:1000px;
+  }
+
+  .title-kicker{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:22px;
+  }
+
+  .title-kicker-line{
+    width:36px;
+    height:2px;
+    background:var(--gold);
+  }
+
+  .title-kicker-text{
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.55);
+  }
+
+  .title-h1{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:52px;
+    line-height:1.1;
+    letter-spacing:-1px;
+    color:var(--white);
+    margin-bottom:26px;
+  }
+
+  .title-h1 .line1{
+    display:block;
+    white-space:nowrap;
+  }
+
+  .title-h1 .acronym{
+    color:var(--white);
+  }
+
+  .title-h1 .year{
+    display:block;
+    color:var(--gold);
+    text-shadow:0 0 40px rgba(188,150,1,0.35);
+  }
+
+  .title-divider{
+    width:110px;
+    height:3px;
+    background:linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+    margin-bottom:24px;
+  }
+
+  .title-sub{
+    font-family:var(--font-body);
+    font-weight:300;
+    font-style:normal;
+    font-size:21px;
+    line-height:1.6;
+    color:rgba(255,255,255,0.72);
+    max-width:520px;
+  }
+
+  .title-sub strong{
+    font-weight:600;
+    font-style:normal;
+    color:var(--gold-bright);
+  }
+
+  .title-footer{
+    position:absolute;
+    left:64px;
+    right:64px;
+    bottom:66px;
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+
+  .title-footer-left{
+    font-size:12.5px;
+    color:rgba(255,255,255,0.4);
+    letter-spacing:0.3px;
+  }
+
+  .title-footer-left b{
+    color:rgba(255,255,255,0.75);
+    font-weight:600;
+  }
+
+  .title-footer-right{
+    font-size:12.5px;
+    color:rgba(255,255,255,0.4);
+    text-align:right;
+    letter-spacing:0.3px;
+  }
+
+  /* subtle entrance animation */
+  .title-main, .title-topbar, .title-footer, .closing-main{
+    animation: titleFadeUp .8s cubic-bezier(.16,.84,.44,1) both;
+  }
+  .title-topbar{ animation-delay:.05s; }
+  .title-main{ animation-delay:.15s; }
+  .title-footer{ animation-delay:.35s; }
+  .closing-main{ animation-delay:.15s; }
+
+  @keyframes titleFadeUp{
+    from{ opacity:0; transform:translateY(16px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* ============================================================
+     REUSABLE SECTION HEADER (dipakai di halaman konten)
+     ============================================================ */
+  .slide-content{
+    position:relative;
+    z-index:5;
+    height:100%;
+    padding:52px 64px 76px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .section-tag{
+    display:inline-block;
+    width:fit-content;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--gold);
+    background:rgba(188,150,1,0.1);
+    border:1px solid rgba(188,150,1,0.35);
+    padding:6px 14px;
+    border-radius:100px;
+    margin-bottom:14px;
+  }
+
+  .section-title{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:36px;
+    line-height:1.15;
+    letter-spacing:-0.5px;
+    color:var(--white);
+    margin-bottom:10px;
+  }
+
+  .section-lead{
+    font-family:var(--font-body);
+    font-size:14.5px;
+    line-height:1.7;
+    color:rgba(255,255,255,0.6);
+    max-width:660px;
+  }
+
+  /* ============================================================
+     SLIDE 2 — RUMAH -> LINGKUNGAN
+     ============================================================ */
+  .slide-transisi{
+    background:var(--dark-2);
+  }
+
+  .slide-transisi::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse 800px 500px at 92% 0%, rgba(188,150,1,0.14) 0%, transparent 55%),
+      radial-gradient(ellipse 600px 500px at 0% 100%, rgba(188,150,1,0.08) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .diagram-wrap{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-top:4px;
+  }
+
+  .diagram-wrap svg{
+    width:100%;
+    height:100%;
+    max-height:420px;
+    overflow:visible;
+  }
+
+  .dg-family-box{
+    fill:rgba(188,150,1,0.05);
+    stroke:var(--gold);
+    stroke-width:2;
+    stroke-dasharray:6 6;
+  }
+
+  .dg-tag-box{
+    fill:rgba(188,150,1,0.12);
+    stroke:rgba(188,150,1,0.4);
+    stroke-width:1;
+  }
+
+  .dg-tag-box-outline{
+    fill:rgba(255,255,255,0.03);
+    stroke:rgba(255,255,255,0.35);
+  }
+
+  .dg-tag-text{
+    font-family:var(--font-body);
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    fill:var(--gold);
+  }
+
+  .dg-tag-text-light{
+    fill:rgba(255,255,255,0.75);
+  }
+
+  .dg-note{
+    font-family:var(--font-body);
+    font-size:12px;
+    font-style:italic;
+    fill:rgba(255,255,255,0.4);
+  }
+
+  .dg-node{
+    fill:var(--dark-3);
+    stroke:var(--gold);
+    stroke-width:2;
+  }
+
+  .dg-node-pt{
+    stroke:var(--gold-bright);
+    stroke-width:3;
+  }
+
+  .dg-node-dest{
+    fill:var(--dark-2);
+    stroke:var(--gold-bright);
+    stroke-width:2.5;
+  }
+
+  .dg-node-label{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:20px;
+    fill:var(--white);
+  }
+
+  .dg-node-label-sm{
+    font-size:16px;
+  }
+
+  .dg-emoji{
+    font-size:30px;
+  }
+
+  .dg-dest-label{
+    font-family:var(--font-body);
+    font-size:14px;
+    font-weight:500;
+    fill:rgba(255,255,255,0.75);
+  }
+
+  .dg-arrow-seq{
+    stroke:var(--gold);
+    stroke-width:2.5;
+  }
+
+  .dg-arrow-fork{
+    stroke:var(--gold-bright);
+    stroke-width:3;
+  }
+
+  .dg-arrowhead-gold{ fill:var(--gold); }
+  .dg-arrowhead-bright{ fill:var(--gold-bright); }
+
+  .dg-watermark{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:180px;
+    fill:none;
+    stroke:rgba(188,150,1,0.14);
+    stroke-width:2;
+  }
+
+  /* fade-in setiap kali slide 2 tampil */
+  .slide-transisi .slide-header{
+    animation: titleFadeUp .8s cubic-bezier(.16,.84,.44,1) both;
+  }
+  .slide-transisi .diagram-wrap{
+    animation: titleFadeUp .9s cubic-bezier(.16,.84,.44,1) both;
+    animation-delay:.15s;
+  }
+
+  /* ============================================================
+     SLIDE 3 — PROFIL PROFESIONAL MANDIRI
+     ============================================================ */
+  .slide-profil{
+    background:var(--dark);
+  }
+
+  .slide-profil .slide-header{
+    animation: titleFadeUp .8s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .slide-profil::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse 900px 700px at 8% 100%,  rgba(188,150,1,0.16) 0%, transparent 55%),
+      radial-gradient(ellipse 700px 500px at 96% 0%,    rgba(188,150,1,0.10) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .profil-grid{
+    flex:1;
+    display:flex;
+    align-items:flex-start;
+    gap:28px;
+    margin-top:28px;
+  }
+
+  .profil-card{
+    flex:1;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    padding:32px 26px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    border-radius:18px;
+    overflow:hidden;
+    opacity:0;
+    animation: titleFadeUp .7s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .profil-card:nth-child(1){ animation-delay:.15s; }
+  .profil-card:nth-child(2){ animation-delay:.28s; }
+  .profil-card:nth-child(3){ animation-delay:.41s; }
+
+  .profil-card-num{
+    position:absolute;
+    top:14px;
+    right:20px;
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:48px;
+    line-height:1;
+    color:rgba(188,150,1,0.16);
+    pointer-events:none;
+  }
+
+  .profil-icon{
+    width:56px;
+    height:56px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:26px;
+    background:rgba(188,150,1,0.1);
+    border:1px solid rgba(188,150,1,0.35);
+  }
+
+  .profil-card-title{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:19px;
+    line-height:1.3;
+    color:var(--white);
+  }
+
+  .profil-card-desc{
+    font-family:var(--font-body);
+    font-size:13.5px;
+    line-height:1.65;
+    color:rgba(255,255,255,0.6);
+  }
+
+  .profil-subroles{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+    margin-top:2px;
+    padding-top:16px;
+    border-top:1px solid var(--dark-border);
+  }
+
+  .profil-subroles li{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-family:var(--font-body);
+    font-size:12.5px;
+    font-weight:500;
+    color:rgba(255,255,255,0.75);
+  }
+
+  .profil-subroles li::before{
+    content:'';
+    width:5px;
+    height:5px;
+    flex-shrink:0;
+    border-radius:50%;
+    background:var(--gold-bright);
+    box-shadow:0 0 6px rgba(212,172,2,0.6);
+  }
+
+  /* ============================================================
+     SLIDE 4 — CAPAIAN PEMBELAJARAN LULUSAN (CPL)
+     ============================================================ */
+  .slide-cpl{
+    background:var(--dark-2);
+  }
+
+  .slide-cpl .slide-header{
+    animation: titleFadeUp .8s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .slide-cpl::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse 800px 600px at 100% 100%, rgba(188,150,1,0.14) 0%, transparent 55%),
+      radial-gradient(ellipse 600px 500px at 0% 0%,      rgba(188,150,1,0.08) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .cpl-body{
+    flex:1;
+    display:grid;
+    grid-template-columns:460px 1fr;
+    align-content:start;
+    gap:26px;
+    margin-top:22px;
+    min-height:0;
+    opacity:0;
+    animation: titleFadeUp .9s cubic-bezier(.16,.84,.44,1) both;
+    animation-delay:.15s;
+  }
+
+  .cpl-list{
+    width:460px;
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .cpl-item{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:8px 14px;
+    border:1px solid var(--dark-border);
+    border-radius:10px;
+    background:rgba(255,255,255,0.02);
+    cursor:pointer;
+    transition:all .18s ease;
+  }
+
+  .cpl-item:hover,
+  .cpl-item.active{
+    border-color:var(--gold);
+    background:rgba(188,150,1,0.12);
+  }
+
+  .cpl-num{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:14px;
+    color:var(--gold);
+    width:24px;
+    flex-shrink:0;
+  }
+
+  .cpl-item.active .cpl-num,
+  .cpl-item:hover .cpl-num{
+    color:var(--gold-bright);
+  }
+
+  .cpl-title{
+    font-family:var(--font-body);
+    font-size:13px;
+    font-weight:600;
+    color:rgba(255,255,255,0.85);
+  }
+
+  .cpl-item.active .cpl-title,
+  .cpl-item:hover .cpl-title{
+    color:var(--white);
+  }
+
+  .cpl-detail{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:16px;
+    padding:40px 40px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    border-radius:18px;
+    overflow:hidden;
+  }
+
+  .cpl-detail-num{
+    position:absolute;
+    top:18px;
+    right:26px;
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:64px;
+    line-height:1;
+    color:rgba(188,150,1,0.16);
+    pointer-events:none;
+  }
+
+  .cpl-detail-title{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:23px;
+    line-height:1.3;
+    color:var(--white);
+    max-width:440px;
+  }
+
+  .cpl-detail-desc{
+    font-family:var(--font-body);
+    font-size:14.5px;
+    line-height:1.75;
+    color:rgba(255,255,255,0.65);
+    max-width:440px;
+  }
+
+  /* ============================================================
+     SLIDE 5 — STRUKTUR KURIKULUM
+     ============================================================ */
+  .slide-kurikulum{
+    background:var(--dark);
+  }
+
+  .slide-kurikulum .slide-header{
+    animation: titleFadeUp .8s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .slide-kurikulum::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse 900px 700px at 92% 4%,  rgba(188,150,1,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse 700px 500px at 4% 100%,  rgba(188,150,1,0.09) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .cur-box{
+    fill:var(--dark-3);
+    stroke:var(--gold);
+    stroke-width:2;
+  }
+
+  .cur-box-accent{
+    fill:rgba(188,150,1,0.14);
+    stroke:var(--gold-bright);
+    stroke-width:2.5;
+  }
+
+  .cur-box-num{
+    font-family:var(--font-heading);
+    font-weight:900;
+    fill:var(--white);
+  }
+
+  .cur-box-label{
+    font-family:var(--font-body);
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    fill:rgba(255,255,255,0.65);
+  }
+
+  .cur-circle{
+    fill:rgba(188,150,1,0.1);
+    stroke:var(--gold-bright);
+    stroke-width:3;
+  }
+
+  .cur-circle-label{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:20px;
+    fill:var(--white);
+  }
+
+  .cur-note-box{
+    fill:rgba(255,255,255,0.03);
+    stroke:rgba(255,255,255,0.25);
+    stroke-width:1.5;
+  }
+
+  .cur-note-title{
+    font-family:var(--font-body);
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    fill:var(--gold);
+  }
+
+  .cur-note-item{
+    font-family:var(--font-body);
+    font-size:15px;
+    font-weight:600;
+    fill:rgba(255,255,255,0.85);
+  }
+
+  .cur-arrow{
+    stroke:var(--gold-bright);
+    stroke-width:3;
+  }
+
+  .cur-arrowhead{ fill:var(--gold-bright); }
+
+  .cur-final{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:22px;
+    fill:var(--gold-bright);
+  }
+
+  .kurikulum-body{
+    flex:1;
+    display:flex;
+    gap:32px;
+    margin-top:22px;
+    min-height:0;
+    opacity:0;
+    animation: titleFadeUp .9s cubic-bezier(.16,.84,.44,1) both;
+    animation-delay:.15s;
+  }
+
+  .cur-tabs-panel{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    min-height:0;
+    min-width:0;
+  }
+
+  .cur-tabs{
+    display:flex;
+    gap:10px;
+  }
+
+  .cur-tab{
+    appearance:none;
+    font-family:var(--font-body);
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:0.3px;
+    color:rgba(255,255,255,0.6);
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    padding:10px 20px;
+    border-radius:100px;
+    cursor:pointer;
+    transition:all .2s ease;
+  }
+
+  .cur-tab:hover{
+    border-color:var(--gold);
+    color:var(--white);
+  }
+
+  .cur-tab.active{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:var(--dark);
+    box-shadow:0 0 14px rgba(188,150,1,0.45);
+  }
+
+  .cur-tab-panels{
+    flex:1;
+    position:relative;
+    min-height:0;
+  }
+
+  .cur-tab-panel{
+    display:none;
+  }
+
+  .cur-tab-panel.active{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    animation: titleFadeUp .5s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .cur-logo-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    align-content:start;
+    gap:16px;
+  }
+
+  .cur-course-list{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+    padding-top:16px;
+    padding-left:100px;
+    border-top:1px solid var(--dark-border);
+  }
+
+  .cur-course-list-2col{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    column-gap:24px;
+    row-gap:9px;
+  }
+
+  .cur-course-list-2col .cur-course-list-title{
+    grid-column:1 / -1;
+  }
+
+  .cur-course-list-title{
+    font-family:var(--font-body);
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:4px;
+  }
+
+  .cur-course-item{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-family:var(--font-body);
+    font-size:12.5px;
+    font-weight:500;
+    color:rgba(255,255,255,0.8);
+  }
+
+  .cur-course-item::before{
+    content:'';
+    width:5px;
+    height:5px;
+    flex-shrink:0;
+    border-radius:50%;
+    background:var(--gold-bright);
+    box-shadow:0 0 6px rgba(212,172,2,0.6);
+  }
+
+  .cur-logo-card{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:10px;
+  }
+
+  .cur-logo-card img{
+    height:40px;
+    width:auto;
+    max-width:100%;
+    object-fit:contain;
+  }
+
+  /* ============================================================
+     SLIDE 6 — SIAP MEMASUKI DUNIA NYATA
+     ============================================================ */
+  .slide-siap{
+    background:var(--dark-2);
+  }
+
+  .slide-siap .slide-header{
+    animation: titleFadeUp .8s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .slide-siap::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse 800px 600px at 6% 4%,   rgba(188,150,1,0.15) 0%, transparent 55%),
+      radial-gradient(ellipse 700px 550px at 98% 98%,  rgba(188,150,1,0.09) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .siap-grid{
+    flex:1;
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    grid-template-rows:minmax(0, 1fr);
+    gap:24px;
+    margin-top:20px;
+    min-height:0;
+  }
+
+  .siap-col-left{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    grid-template-rows:repeat(2, minmax(0, 1fr));
+    gap:14px;
+    min-height:0;
+  }
+
+  .siap-card{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:18px 18px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    border-radius:16px;
+    overflow:hidden;
+    opacity:0;
+    animation: titleFadeUp .7s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .siap-card:nth-child(1){ animation-delay:.10s; }
+  .siap-card:nth-child(2){ animation-delay:.17s; }
+  .siap-card:nth-child(3){ animation-delay:.24s; }
+  .siap-card:nth-child(4){ animation-delay:.31s; }
+
+  .siap-col-right{
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+
+  .siap-list-panel{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:20px 24px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    border-radius:16px;
+    opacity:0;
+    animation: titleFadeUp .7s cubic-bezier(.16,.84,.44,1) both;
+    animation-delay:.38s;
+  }
+
+  .siap-list-head{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-shrink:0;
+    padding-bottom:14px;
+    margin-bottom:6px;
+    border-bottom:1px solid var(--dark-border);
+  }
+
+  .siap-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .siap-list li{
+    flex:1;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:var(--font-body);
+    font-size:13px;
+    font-weight:500;
+    color:rgba(255,255,255,0.8);
+    border-bottom:1px solid var(--dark-border);
+  }
+
+  .siap-list li:last-child{
+    border-bottom:none;
+  }
+
+  .siap-list-check{
+    flex-shrink:0;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    color:var(--gold-bright);
+    background:rgba(188,150,1,0.12);
+    border:1px solid rgba(188,150,1,0.4);
+  }
+
+  .siap-card-num{
+    position:absolute;
+    top:8px;
+    right:14px;
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:34px;
+    line-height:1;
+    color:rgba(188,150,1,0.16);
+    pointer-events:none;
+  }
+
+  .siap-icon{
+    width:42px;
+    height:42px;
+    border-radius:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    background:rgba(188,150,1,0.1);
+    border:1px solid rgba(188,150,1,0.35);
+  }
+
+  .siap-card-title{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:15px;
+    line-height:1.25;
+    color:var(--white);
+  }
+
+  .siap-card-desc{
+    font-family:var(--font-body);
+    font-size:11.8px;
+    line-height:1.5;
+    color:rgba(255,255,255,0.6);
+  }
+
+  /* ============================================================
+     SLIDE 7 — ALUMNI TRM
+     ============================================================ */
+  .slide-alumni{
+    background:var(--dark);
+  }
+
+  .slide-alumni .slide-header{
+    animation: titleFadeUp .8s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .slide-alumni::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse 900px 700px at 6% 2%,   rgba(188,150,1,0.16) 0%, transparent 55%),
+      radial-gradient(ellipse 750px 600px at 96% 98%,  rgba(188,150,1,0.1) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .alu-grid{
+    flex:1;
+    display:grid;
+    grid-template-columns:1.35fr 1fr;
+    gap:24px;
+    margin-top:18px;
+    min-height:0;
+  }
+
+  .alu-companies{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    grid-template-rows:repeat(2, 1fr);
+    gap:12px;
+  }
+
+  .alu-cat-card{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:14px 16px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    border-radius:14px;
+    overflow:hidden;
+    opacity:0;
+    animation: titleFadeUp .7s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .alu-cat-card:nth-child(1){ animation-delay:.10s; }
+  .alu-cat-card:nth-child(2){ animation-delay:.16s; }
+  .alu-cat-card:nth-child(3){ animation-delay:.22s; }
+  .alu-cat-card:nth-child(4){ animation-delay:.28s; }
+  .alu-cat-card:nth-child(5){ animation-delay:.34s; }
+  .alu-cat-card:nth-child(6){ animation-delay:.40s; }
+
+  .alu-cat-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .alu-cat-icon{
+    width:32px;
+    height:32px;
+    flex-shrink:0;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    background:rgba(188,150,1,0.1);
+    border:1px solid rgba(188,150,1,0.35);
+  }
+
+  .alu-cat-label{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:13.5px;
+    color:var(--white);
+  }
+
+  .alu-cat-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+
+  .alu-chip{
+    font-family:var(--font-body);
+    font-size:10.5px;
+    font-weight:600;
+    color:rgba(255,255,255,0.75);
+    background:rgba(188,150,1,0.08);
+    border:1px solid rgba(188,150,1,0.28);
+    padding:4px 10px;
+    border-radius:100px;
+    white-space:nowrap;
+  }
+
+  .alu-position-panel{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:18px 22px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    border-radius:16px;
+    opacity:0;
+    animation: titleFadeUp .7s cubic-bezier(.16,.84,.44,1) both;
+    animation-delay:.42s;
+  }
+
+  .alu-position-head{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-shrink:0;
+    padding-bottom:12px;
+    margin-bottom:4px;
+    border-bottom:1px solid var(--dark-border);
+  }
+
+  .alu-position-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .alu-position-list li{
+    flex:1;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:var(--font-body);
+    font-size:12.3px;
+    font-weight:500;
+    color:rgba(255,255,255,0.8);
+    border-bottom:1px solid var(--dark-border);
+  }
+
+  .alu-position-list li:last-child{
+    border-bottom:none;
+  }
+
+  .alu-position-num{
+    flex-shrink:0;
+    width:22px;
+    height:22px;
+    border-radius:7px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:10.5px;
+    color:var(--gold-bright);
+    background:rgba(188,150,1,0.12);
+    border:1px solid rgba(188,150,1,0.4);
+  }
+
+  /* ============================================================
+     SLIDE 8 — TRACER STUDY ALUMNI
+     ============================================================ */
+  .slide-tracer{
+    background:var(--dark-2);
+  }
+
+  .slide-tracer .slide-header{
+    animation: titleFadeUp .8s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .slide-tracer::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse 900px 700px at 94% 6%,   rgba(188,150,1,0.16) 0%, transparent 55%),
+      radial-gradient(ellipse 750px 600px at 4% 96%,    rgba(188,150,1,0.1) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .tracer-body{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    margin-top:18px;
+    min-height:0;
+  }
+
+  .tracer-kpis{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:16px;
+  }
+
+  .tracer-kpi{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:18px 20px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    border-radius:16px;
+    opacity:0;
+    animation: titleFadeUp .7s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .tracer-kpi:nth-child(1){ animation-delay:.10s; }
+  .tracer-kpi:nth-child(2){ animation-delay:.18s; }
+  .tracer-kpi:nth-child(3){ animation-delay:.26s; }
+  .tracer-kpi:nth-child(4){ animation-delay:.34s; }
+
+  .tracer-kpi-icon{
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+    background:rgba(188,150,1,0.1);
+    border:1px solid rgba(188,150,1,0.35);
+  }
+
+  .tracer-kpi-value{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:27px;
+    line-height:1.15;
+    color:var(--gold-bright);
+  }
+
+  .tracer-kpi-label{
+    font-family:var(--font-body);
+    font-size:11.8px;
+    line-height:1.4;
+    color:rgba(255,255,255,0.6);
+  }
+
+  .tracer-charts-row{
+    flex:1;
+    display:flex;
+    gap:20px;
+    min-height:0;
+  }
+
+  .tracer-trend-panel{
+    flex:1.05;
+    display:flex;
+    flex-direction:column;
+    padding:22px 26px 18px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    border-radius:16px;
+    min-height:0;
+    opacity:0;
+    animation: titleFadeUp .7s cubic-bezier(.16,.84,.44,1) both;
+    animation-delay:.42s;
+  }
+
+  .tracer-trend-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-shrink:0;
+    margin-bottom:14px;
+  }
+
+  .tracer-trend-title{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:15px;
+    color:var(--white);
+  }
+
+  .tracer-trend-sub{
+    font-family:var(--font-body);
+    font-size:11.5px;
+    color:rgba(255,255,255,0.5);
+  }
+
+  .tracer-chart{
+    flex:1;
+    display:flex;
+    align-items:flex-end;
+    gap:36px;
+    padding:0 24px;
+    min-height:0;
+  }
+
+  .tracer-col{
+    flex:1;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-end;
+  }
+
+  .tracer-col-value{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:14px;
+    color:var(--white);
+    margin-bottom:8px;
+  }
+
+  .tracer-col-bar{
+    width:58px;
+    border-radius:8px 8px 3px 3px;
+    background:linear-gradient(180deg, var(--gold-bright) 0%, var(--gold-muted) 100%);
+  }
+
+  .tracer-col-year{
+    font-family:var(--font-body);
+    font-size:11px;
+    font-weight:600;
+    color:rgba(255,255,255,0.55);
+    margin-top:10px;
+  }
+
+  .tracer-profile-panel{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:22px 26px 18px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    border-radius:16px;
+    min-height:0;
+    opacity:0;
+    animation: titleFadeUp .7s cubic-bezier(.16,.84,.44,1) both;
+    animation-delay:.5s;
+  }
+
+  .tracer-profile-panel .tracer-trend-head{
+    margin-bottom:18px;
+  }
+
+  .tracer-profile-row{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:7px;
+  }
+
+  .tracer-profile-label{
+    font-family:var(--font-body);
+    font-size:12px;
+    font-weight:600;
+    color:rgba(255,255,255,0.75);
+  }
+
+  .tracer-profile-bar{
+    display:flex;
+    gap:2px;
+    height:18px;
+    border-radius:6px;
+    overflow:hidden;
+    background:rgba(255,255,255,0.05);
+  }
+
+  .tracer-profile-seg{
+    height:100%;
+  }
+
+  .tracer-seg-1{ background:var(--gold-bright); }
+  .tracer-seg-2{ background:var(--gold-muted); }
+  .tracer-seg-3{ background:rgba(255,255,255,0.22); }
+
+  .tracer-profile-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 14px;
+  }
+
+  .tracer-profile-legend span{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--font-body);
+    font-size:10.8px;
+    color:rgba(255,255,255,0.6);
+  }
+
+  .tracer-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    flex-shrink:0;
+    font-style:normal;
+  }
+
+  .tracer-col:last-child .tracer-col-bar{
+    background:linear-gradient(180deg, #f0cf3a 0%, var(--gold-bright) 100%);
+    box-shadow:0 0 18px rgba(212,172,2,0.35);
+  }
+
+  .tracer-col:last-child .tracer-col-value{
+    color:var(--gold-bright);
+  }
+
+  /* ============================================================
+     SLIDE 9 — ASET: WAKTU, TENAGA, SKILL
+     ============================================================ */
+  .slide-aset{
+    background:var(--dark);
+  }
+
+  .slide-aset .slide-header{
+    animation: titleFadeUp .8s cubic-bezier(.16,.84,.44,1) both;
+  }
+
+  .slide-aset::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse 900px 700px at 92% 96%,  rgba(188,150,1,0.16) 0%, transparent 55%),
+      radial-gradient(ellipse 750px 600px at 4% 4%,     rgba(188,150,1,0.1) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .aset-body{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:8px;
+    min-height:0;
+  }
+
+  .aset-eq-row{
+    flex:1;
+    display:grid;
+    grid-template-columns: 120px auto 1fr;
+    column-gap:24px;
+    align-items:center;
+    padding:10px 28px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--dark-border);
+    border-radius:18px;
+    opacity:0;
+    animation: titleFadeUp .7s cubic-bezier(.16,.84,.44,1) both;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .aset-eq-row:nth-of-type(1){ animation-delay:.12s; }
+  .aset-eq-row:nth-of-type(2){ animation-delay:.2s; }
+  .aset-eq-row-tuai{ animation-delay:.28s; }
+
+  .aset-inline-insight{
+    font-family:var(--font-body);
+    font-size:12.5px;
+    line-height:1.5;
+    color:rgba(255,255,255,0.55);
+    padding-left:22px;
+    border-left:1px solid var(--dark-border);
+  }
+
+  .aset-inline-insight strong{
+    color:var(--gold-bright);
+    font-weight:700;
+  }
+
+  .aset-eq-tag{
+    flex-shrink:0;
+    width:120px;
+    font-family:var(--font-body);
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:1.6px;
+    text-transform:uppercase;
+    color:var(--gold-bright);
+    border-left:4px solid var(--gold-bright);
+    padding-left:14px;
+    line-height:1.35;
+  }
+
+  .aset-eq-flow{
+    display:grid;
+    grid-template-columns: 92px 38px 92px 38px 92px 38px 92px;
+    column-gap:12px;
+    align-items:center;
+  }
+
+  .aset-term{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    width:92px;
+    height:62px;
+    flex-shrink:0;
+    border-radius:14px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--dark-border);
+  }
+
+  .aset-term-icon{
+    font-size:22px;
+  }
+
+  .aset-term-label{
+    font-family:var(--font-body);
+    font-size:12px;
+    font-weight:600;
+    color:rgba(255,255,255,0.7);
+  }
+
+  .aset-term-highlight{
+    background:rgba(188,150,1,0.14);
+    border:1px solid var(--gold-bright);
+    box-shadow:0 0 20px rgba(212,172,2,0.25);
+  }
+
+  .aset-term-highlight .aset-term-label{
+    color:var(--white);
+    font-weight:800;
+  }
+
+  .aset-op{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:20px;
+    color:rgba(255,255,255,0.3);
+    text-align:center;
+  }
+
+  .aset-arrow{
+    font-size:26px;
+    color:var(--gold-bright);
+    text-align:center;
+  }
+
+  /* ============================================================
+     SLIDE 10 — PENUTUP
+     ============================================================ */
+  .slide-closing{
+    background:var(--dark);
+  }
+
+  .slide-closing::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse 900px 700px at 14% 92%,  rgba(188,150,1,0.24) 0%, transparent 55%),
+      radial-gradient(ellipse 700px 600px at 92% 6%,    rgba(188,150,1,0.1) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .slide-closing::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 26px 26px;
+    mask-image: radial-gradient(ellipse 700px 500px at 22% 68%, black 0%, transparent 70%);
+    pointer-events:none;
+  }
+
+  .closing-main{
+    position:relative;
+    z-index:5;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 64px;
+  }
+
+  .closing-kicker{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:22px;
+  }
+
+  .closing-h1{
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:64px;
+    line-height:1.1;
+    letter-spacing:-1px;
+    color:var(--white);
+    margin-bottom:22px;
+  }
+
+  .closing-sub{
+    font-family:var(--font-body);
+    font-weight:300;
+    font-size:21px;
+    line-height:1.7;
+    color:rgba(255,255,255,0.75);
+    max-width:760px;
+  }
+
+  .closing-sub strong{
+    font-weight:600;
+    font-style:normal;
+    color:var(--gold-bright);
+  }
+
+  .closing-enjoy{
+    margin-top:28px;
+    font-family:var(--font-heading);
+    font-weight:900;
+    font-size:16px;
+    letter-spacing:6px;
+    text-transform:uppercase;
+    color:var(--gold-bright);
+  }
+</style>
+</head>
+<body>
+
+  <div class="stage">
+    <div class="deck" id="deck">
+
+      <div class="slides" id="slides">
+
+        <!-- ===================== SLIDE 1 : JUDUL ===================== -->
+        <section class="slide slide-title active" id="slide-1">
+
+          <div class="title-watermark">26</div>
+
+          <div class="title-topbar">
+            <img src="gambar/logo-trm.png" alt="Logo TRM" class="title-logo-img" />
+            <span class="title-eyebrow-pill"><span class="dot"></span>Welcoming Party Mahasiswa Baru</span>
+          </div>
+
+          <div class="title-main">
+            <div class="title-kicker">
+              <div class="title-kicker-line"></div>
+              <span class="title-kicker-text">Program Studi S1 Terapan Teknologi Rekayasa Multimedia</span>
+            </div>
+
+            <h1 class="title-h1">
+              <span class="line1">Pengenalan Kehidupan Kampus</span>
+              Mahasiswa Baru <span class="acronym">(PKKMB)</span>
+              <span class="year">2026</span>
+            </h1>
+
+            <div class="title-divider"></div>
+
+            <p class="title-sub">
+              Dari <strong>kehangatan keluarga</strong>,<br />
+              menuju <strong>pertarungan di dunia nyata</strong>.
+            </p>
+          </div>
+
+          <div class="title-footer">
+            <div class="title-footer-left"><b>Fakultas Ilmu Terapan</b> · Universitas Telkom</div>
+            <div class="title-footer-right">Bandung, 08 September 2026</div>
+          </div>
+
+        </section>
+
+        <!-- ===================== SLIDE 2 : RUMAH -> LINGKUNGAN ===================== -->
+        <section class="slide slide-transisi" id="slide-2">
+          <div class="slide-content">
+
+            <div class="slide-header">
+              <span class="section-tag">Refleksi Peran</span>
+              <h2 class="section-title">Bersiap Ambil Peran <span class="gold">di Masyarakat</span></h2>
+              <p class="section-lead">
+                Selama SD hingga SMA, kita adalah tanggung jawab orang tua kita.
+                Setelah lulus kuliah, kita adalah tanggung jawab kita sendiri.
+                Siapa kita di masyarakat?
+              </p>
+            </div>
+
+            <div class="diagram-wrap">
+              <svg viewBox="0 0 1152 480" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <marker id="arrowGoldS2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" class="dg-arrowhead-gold"></path>
+                  </marker>
+                  <marker id="arrowBrightS2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" class="dg-arrowhead-bright"></path>
+                  </marker>
+                </defs>
+
+                <!-- fork watermark -->
+                <text x="700" y="270" text-anchor="middle" class="dg-watermark">?</text>
+
+                <!-- family container -->
+                <rect x="16" y="130" width="608" height="210" rx="20" class="dg-family-box"></rect>
+                <rect x="16" y="18" width="200" height="26" rx="13" class="dg-tag-box"></rect>
+                <text x="116" y="36" text-anchor="middle" class="dg-tag-text">RUMAH &amp; KELUARGA</text>
+                <!-- <text x="34" y="156" class="dg-note">selalu pulang, selalu dilindungi</text> -->
+
+                <!-- lingkungan tag -->
+                <rect x="735" y="18" width="250" height="26" rx="13" class="dg-tag-box dg-tag-box-outline"></rect>
+                <text x="860" y="36" text-anchor="middle" class="dg-tag-text dg-tag-text-light">LINGKUNGAN &amp; MASYARAKAT</text>
+
+                <!-- sequential arrows: SD -> SMP -> SMA -> PT -->
+                <line x1="136" y1="235" x2="213" y2="235" class="dg-arrow-seq" marker-end="url(#arrowGoldS2)"></line>
+                <line x1="293" y1="235" x2="369" y2="235" class="dg-arrow-seq" marker-end="url(#arrowGoldS2)"></line>
+                <line x1="449" y1="235" x2="526" y2="235" class="dg-arrow-seq" marker-end="url(#arrowGoldS2)"></line>
+
+                <!-- diverging arrows from PT ke lingkungan -->
+                <line x1="630" y1="235" x2="806" y2="136" class="dg-arrow-fork" marker-end="url(#arrowBrightS2)"></line>
+                <line x1="630" y1="235" x2="808" y2="235" class="dg-arrow-fork" marker-end="url(#arrowBrightS2)"></line>
+                <line x1="630" y1="235" x2="806" y2="334" class="dg-arrow-fork" marker-end="url(#arrowBrightS2)"></line>
+
+                <!-- SD SMP SMA PT nodes -->
+                <g>
+                  <circle cx="96" cy="235" r="40" class="dg-node"></circle>
+                  <text x="96" y="243" text-anchor="middle" class="dg-node-label">SD</text>
+
+                  <circle cx="253" cy="235" r="40" class="dg-node"></circle>
+                  <text x="253" y="241" text-anchor="middle" class="dg-node-label dg-node-label-sm">SMP</text>
+
+                  <circle cx="409" cy="235" r="40" class="dg-node"></circle>
+                  <text x="409" y="241" text-anchor="middle" class="dg-node-label dg-node-label-sm">SMA</text>
+
+                  <circle cx="566" cy="235" r="40" class="dg-node dg-node-pt"></circle>
+                  <text x="566" y="243" text-anchor="middle" class="dg-node-label">PT</text>
+                </g>
+
+                <!-- <text x="480" y="322" text-anchor="middle" class="dg-note">&#8617; tetap pulang ke rumah</text> -->
+
+                <!-- destination nodes: peran di lingkungan -->
+                <g>
+                  <circle cx="860" cy="110" r="46" class="dg-node dg-node-dest"></circle>
+                  <text x="860" y="120" text-anchor="middle" class="dg-emoji">&#128188;</text>
+                  <text x="918" y="116" text-anchor="start" class="dg-dest-label">Profesional</text>
+
+                  <circle cx="860" cy="235" r="46" class="dg-node dg-node-dest"></circle>
+                  <text x="860" y="245" text-anchor="middle" class="dg-emoji">&#128161;</text>
+                  <text x="918" y="241" text-anchor="start" class="dg-dest-label">Wirausaha</text>
+
+                  <circle cx="860" cy="360" r="46" class="dg-node dg-node-dest"></circle>
+                  <text x="860" y="370" text-anchor="middle" class="dg-emoji">&#129309;</text>
+                  <text x="918" y="366" text-anchor="start" class="dg-dest-label">Penggerak Sosial</text>
+                </g>
+
+              </svg>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ===================== SLIDE 3 : PROFIL PROFESIONAL MANDIRI ===================== -->
+        <section class="slide slide-profil" id="slide-3">
+          <div class="slide-content">
+
+            <div class="slide-header">
+              <span class="section-tag">Profil Lulusan</span>
+              <h2 class="section-title">Profil <span class="gold">Lulusan (PL)</span></h2>
+              <p class="section-lead">
+                Setiap lulusan TRM, diharapkan memiliki profil berikut. Dengan profil ini, mereka
+                diharapkan menempati posisi sebagai profesional di masyarakat
+                dengan karakteristik kolaboratif, berintegritas, adaptif, dan progresif.
+              </p>
+            </div>
+
+            <div class="profil-grid">
+              <div class="profil-card">
+                <span class="profil-card-num">01</span>
+                <div class="profil-icon">&#127909;</div>
+                <div class="profil-card-title">Profesional di Bidang Teknologi Multimedia</div>
+                <div class="profil-card-desc">
+                  Menguasai kompetensi teknis multimedia yang mumpuni dan siap terjun langsung
+                  di industri.
+                </div>
+                <ul class="profil-subroles">
+                  <li>Pengembang aplikasi multimedia interaktif</li>
+                  <li>Konten kreator yang kreatif</li>
+                  <li>Technopreneur yang inovatif</li>
+                </ul>
+              </div>
+
+              <div class="profil-card">
+                <span class="profil-card-num">02</span>
+                <div class="profil-icon">&#129309;</div>
+                <div class="profil-card-title">Mampu Berkolaborasi dengan Tetap Menjunjung Tinggi Integritas</div>
+                <div class="profil-card-desc">
+                  Mampu bekerja sama lintas tim dan disiplin ilmu tanpa mengorbankan kejujuran
+                  serta etika profesional.
+                </div>
+              </div>
+
+              <div class="profil-card">
+                <span class="profil-card-num">03</span>
+                <div class="profil-icon">&#128640;</div>
+                <div class="profil-card-title">Adaptif dan Progresif</div>
+                <div class="profil-card-desc">
+                  Tanggap terhadap perubahan teknologi, terus berkembang, dan tidak cepat
+                  berpuas diri.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ===================== SLIDE 4 : CAPAIAN PEMBELAJARAN LULUSAN (CPL) ===================== -->
+        <section class="slide slide-cpl" id="slide-4">
+          <div class="slide-content">
+
+            <div class="slide-header">
+              <span class="section-tag">Capaian Pembelajaran Lulusan</span>
+              <h2 class="section-title">Capaian Pembelajaran <span class="gold">Lulusan (CPL)</span></h2>
+              <p class="section-lead">
+                Profil Lulusan (PL) hanya bisa dicapai jika mahasiswa memenuhi sepuluh CPL berikut.
+              </p>
+            </div>
+
+            <div class="cpl-body">
+              <div class="cpl-list" id="cplList">
+                <!-- <div class="cpl-item active" data-desc="Mampu berpikir kritis dan sistematis dalam menganalisis persoalan teknologi multimedia, serta menjunjung tinggi etika dan integritas dalam setiap keputusan profesional."> -->
+                <div class="cpl-item active" data-desc=" Mampu menerapkan pemikiran logis, kritis, sistematis, dan inovatif dalam konteks pengembangan atau implementasi ilmu pengetahuan dan teknologi dengan menjunjung tinggi nilai kemanusiaan dalam menjalankan tugas berdasarkan agama, moral, dan etika.">
+                  <span class="cpl-num">01</span>
+                  <span class="cpl-title">Berpikir kritis dan etis</span>
+                </div>
+                <div class="cpl-item" data-desc="Mampu menunjukkan kinerja mandiri, bermutu, dan terukur dalam mengimplementasikan bidang keilmuan dalam memberikan kontribusi kepada masyarakat luas.">
+                  <span class="cpl-num">02</span>
+                  <span class="cpl-title">Berkontribusi mandiri dan bermutu</span>
+                </div>
+                <div class="cpl-item" data-desc="Mampu mengembangkan pengetahuan dan keterampilan secara mandiri maupun terbimbing sehingga dapat menyesuaikan dengan perkembangan zaman dan mewujudkan pembelajaran yang berkesinambungan.">
+                  <span class="cpl-num">03</span>
+                  <span class="cpl-title">Pembelajar sepanjang hayat</span>
+                </div>
+                <div class="cpl-item" data-desc="Mampu menerapkan pemikiran yang ilmiah dan sistematik dalam menerapkan IPTEKS untuk mendapatkan solusi yang bermutu, terukur, membuat dokumentasi dan melakukan evaluasi terhadap proses dan hasil penerapan tersebut.">
+                  <span class="cpl-num">04</span>
+                  <span class="cpl-title">Pemberi solusi ilmiah dan evaluatif</span>
+                </div>
+                <div class="cpl-item" data-desc="Mampu memelihara dan mengembangkan jaringan kerja sama dan hasil kerjasama di dalam maupun di luar lembaganya.">
+                  <span class="cpl-num">05</span>
+                  <span class="cpl-title">Berkolaborasi dan membangun jejaring</span>
+                </div>
+                <div class="cpl-item" data-desc="Mampu bertindak dan bersikap profesional baik sebagai anggota tim atau pemimpin dalam sebuah organisasi/lembaga.">
+                  <span class="cpl-num">06</span>
+                  <span class="cpl-title">Kerja tim dan kepemimpinan profesional</span>
+                </div>
+                <div class="cpl-item" data-desc="Memiliki pengetahuan dan keahlian untuk membangun konten multimedia dalam bentuk: grafis 2D dan 3D, animasi 2D dan 3D, video, teks, dan suara berdasarkan desain yang telah dibuat.">
+                  <span class="cpl-num">07</span>
+                  <span class="cpl-title">Kreator konten multimedia</span>
+                </div>
+                <div class="cpl-item" data-desc="Memiliki pengetahuan dan keahlian untuk membangun/mengembangkan aplikasi yang memanfaatkan konten multimedia dan teknologi-teknologi interaktivitas seperti: jaringan komputer, sensor dan tranduser, extended reality, dan kecerdasan buatan.">
+                  <span class="cpl-num">08</span>
+                  <span class="cpl-title">Pengembang aplikasi interaktif</span>
+                </div>
+                <div class="cpl-item" data-desc="Mampu mengintegrasikan pengetahuan teknologi dan kewirausahaan untuk menciptakan solusi inovatif, memimpin proyek teknologi dan berhasil dalam pengembangan bisnis bidang teknologi.">
+                  <span class="cpl-num">09</span>
+                  <span class="cpl-title">Technopreneur inovatif</span>
+                </div>
+                <div class="cpl-item" data-desc="Memiliki pengetahuan mengenai standar manajemen proyek perangkat lunak dan mampu menerapkan pada proses pembangunan perangkat lunak khususnya perangkat lunak aplikasi multimedia interaktif.">
+                  <span class="cpl-num">10</span>
+                  <span class="cpl-title">Manajer proyek multimedia</span>
+                </div>
+              </div>
+
+              <div class="cpl-detail" id="cplDetail">
+                <span class="cpl-detail-num" id="cplDetailNum">01</span>
+                <div class="cpl-detail-title" id="cplDetailTitle">Berpikir kritis dan etis</div>
+                <div class="cpl-detail-desc" id="cplDetailDesc">Mampu berpikir kritis dan sistematis dalam menganalisis persoalan multimedia, serta menjunjung tinggi etika dan integritas akademik dalam setiap keputusan profesional.</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ===================== SLIDE 5 : STRUKTUR KURIKULUM ===================== -->
+        <section class="slide slide-kurikulum" id="slide-5">
+          <div class="slide-content">
+
+            <div class="slide-header">
+              <span class="section-tag">Struktur Kurikulum</span>
+              <h2 class="section-title">Capaian Pembelajaran <span class="gold">Mata Kuliah (CPMK)</span></h2>
+              <p class="section-lead">
+                 Ketercapaian Capaian Pembelajaran Lulusan (CPL) dilihat dari nilai
+                CPMK untuk setiap Mata Kuliah.
+                Ketercapaian CPMK dinilai menggunakan asesmen atau rekognisi.
+              </p>
+            </div>
+
+            <div class="kurikulum-body">
+            <div class="diagram-wrap">
+              <svg viewBox="0 0 576 480" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <marker id="arrowCurS5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" class="cur-arrowhead"></path>
+                  </marker>
+                </defs>
+
+                <!-- arrows into CLO circle -->
+                <line x1="250" y1="130" x2="320" y2="218" class="cur-arrow" marker-end="url(#arrowCurS5)"></line>
+                <line x1="460" y1="130" x2="427" y2="204" class="cur-arrow" marker-end="url(#arrowCurS5)"></line>
+                <line x1="215" y1="300" x2="280" y2="300" class="cur-arrow" marker-end="url(#arrowCurS5)"></line>
+
+                <!-- box: jumlah mata kuliah -->
+                <rect x="165" y="15" width="170" height="115" rx="16" class="cur-box"></rect>
+                <text x="250" y="76" text-anchor="middle" class="cur-box-num" style="font-size:40px">51</text>
+                <text x="250" y="112" text-anchor="middle" class="cur-box-label">Mata Kuliah</text>
+
+                <!-- box: SKS untuk lulus (accent) -->
+                <rect x="375" y="15" width="170" height="115" rx="16" class="cur-box-accent"></rect>
+                <text x="460" y="76" text-anchor="middle" class="cur-box-num" style="font-size:40px">144</text>
+                <text x="460" y="112" text-anchor="middle" class="cur-box-label">SKS untuk Lulus</text>
+
+                <!-- circle: Course Learning Outcome -->
+                <circle cx="385" cy="300" r="105" class="cur-circle"></circle>
+                <text x="385" y="269" text-anchor="middle" class="cur-circle-label" style="font-size:19px">
+                  <tspan x="385" dy="0">Capaian</tspan>
+                  <tspan x="385" dy="25">Pembelajaran</tspan>
+                  <tspan x="385" dy="25">Mata Kuliah</tspan>
+                  <tspan x="385" dy="25">(CPMK)</tspan>
+                </text>
+
+                <!-- box: mekanisme penilaian -->
+                <rect x="15" y="245" width="200" height="130" rx="16" class="cur-note-box"></rect>
+                <text x="37" y="277" class="cur-note-title">Dinilai Melalui</text>
+                <text x="37" y="311" class="cur-note-item" style="font-size:14px">1. Asesmen</text>
+                <text x="37" y="341" class="cur-note-item" style="font-size:14px">2. Rekognisi</text>
+
+                <!-- kelulusan -->
+                <text x="385" y="440" text-anchor="middle" class="cur-final">Lulus jika Nilai CPMK &gt; 50</text>
+              </svg>
+            </div>
+
+            <div class="cur-tabs-panel">
+              <div class="cur-tabs" id="curTabs">
+                <button class="cur-tab active" data-tab="developer">Developer</button>
+                <button class="cur-tab" data-tab="konten-kreator">Konten Kreator</button>
+                <button class="cur-tab" data-tab="technopreneur">Technopreneur</button>
+              </div>
+
+              <div class="cur-tab-panels" id="curTabPanels">
+                <div class="cur-tab-panel active" data-panel="developer">
+                  <div class="cur-logo-grid">
+                    <div class="cur-logo-card"><img src="gambar/logo_arduino.png" alt="Arduino"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_csharp.png" alt="C#"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_figma.webp" alt="Figma"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_html.png" alt="HTML"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_mysql.png" alt="MySQL"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_php.png" alt="PHP"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_python.png" alt="Python"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_unity.svg" alt="Unity"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_vscode.png" alt="VS Code"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_vuforia.png" alt="Vuforia"></div>
+                  </div>
+                  <div class="cur-course-list cur-course-list-2col">
+                    <div class="cur-course-list-title">Mata Kuliah Pendukung</div>
+                    <div class="cur-course-item">Pemrograman Web</div>
+                    <div class="cur-course-item">Pemrograman Game</div>
+                    <div class="cur-course-item">Pemrograman Mobile</div>
+                    <div class="cur-course-item">Pemrograman Mikro</div>
+                    <div class="cur-course-item">Artificial Intelligence</div>
+                    <div class="cur-course-item">AR/VR</div>
+                  </div>
+                </div>
+                <div class="cur-tab-panel" data-panel="konten-kreator">
+                  <div class="cur-logo-grid">
+                    <div class="cur-logo-card"><img src="gambar/logo_adobe_illustrator.png" alt="Adobe Illustrator"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_photoshop.png" alt="Photoshop"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_premiere.png" alt="Premiere Pro"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_blender.png" alt="Blender"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_canva.png" alt="Canva"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_capcut.svg" alt="CapCut"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_davinci.png" alt="DaVinci Resolve"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_audacity.svg" alt="Audacity"></div>
+                  </div>
+                  <div class="cur-course-list">
+                    <div class="cur-course-list-title">Mata Kuliah Pendukung</div>
+                    <div class="cur-course-item">2D/3D</div>
+                    <div class="cur-course-item">Audio</div>
+                    <div class="cur-course-item">Video</div>
+                    <div class="cur-course-item">Storytelling</div>
+                  </div>
+                </div>
+                <div class="cur-tab-panel" data-panel="technopreneur">
+                  <div class="cur-logo-grid">
+                    <div class="cur-logo-card"><img src="gambar/logo_ms_word.svg" alt="Microsoft Word"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_ms_excel.webp" alt="Microsoft Excel"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_ms_powerpoint.webp" alt="Microsoft PowerPoint"></div>
+                    <div class="cur-logo-card"><img src="gambar/logo_trello.png" alt="Trello"></div>
+                  </div>
+                  <div class="cur-course-list">
+                    <div class="cur-course-list-title">Mata Kuliah Pendukung</div>
+                    <div class="cur-course-item">Pengantar Bisnis TIK</div>
+                    <div class="cur-course-item">Inovasi Bisnis TIK</div>
+                    <div class="cur-course-item">Jaringan Pelanggan Bisnis TIK</div>
+                    <div class="cur-course-item">Kewirausahaan</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ===================== SLIDE 6 : SIAP MEMASUKI DUNIA NYATA ===================== -->
+        <section class="slide slide-siap" id="slide-6">
+          <div class="slide-content">
+
+            <div class="slide-header">
+              <span class="section-tag">Persiapan Diri</span>
+              <h2 class="section-title">Siap Memasuki <span class="gold">Dunia Nyata</span></h2>
+              <p class="section-lead">
+                 Jika dirangkum, inilah
+              </p>
+            </div>
+
+            <div class="siap-grid">
+              <div class="siap-col-left">
+                <div class="siap-card">
+                  <span class="siap-card-num">01</span>
+                  <div class="siap-icon">&#128193;</div>
+                  <div class="siap-card-title">Portofolio</div>
+                  <div class="siap-card-desc">Bangun portofolio karya sejak dini sebagai bukti nyata kompetensi di depan industri.</div>
+                </div>
+
+                <div class="siap-card">
+                  <span class="siap-card-num">02</span>
+                  <div class="siap-icon">&#129513;</div>
+                  <div class="siap-card-title">Creative Problem Solving</div>
+                  <div class="siap-card-desc">Jadikan setiap tugas, PR, dan asesmen sebagai challenge untuk mengasah kemampuan problem solving.</div>
+                </div>
+
+                <div class="siap-card">
+                  <span class="siap-card-num">03</span>
+                  <div class="siap-icon">&#129504;</div>
+                  <div class="siap-card-title">Critical Thinking</div>
+                  <div class="siap-card-desc">Serap semua materi yang diajarkan dengan menerapkan critical thinking, bukan sekadar menghafal.</div>
+                </div>
+
+                <div class="siap-card">
+                  <span class="siap-card-num">04</span>
+                  <div class="siap-icon">&#129309;</div>
+                  <div class="siap-card-title">Jaringan &amp; Kolaborasi</div>
+                  <div class="siap-card-desc">Bangun jaringan pertemanan dan kolaborasi dengan mahasiswa lain lewat Unit Kegiatan Mahasiswa atau kegiatan lain.</div>
+                </div>
+              </div>
+
+              <div class="siap-col-right">
+                <div class="siap-list-panel">
+                  <div class="siap-list-head">
+                    <div class="siap-icon">&#9989;</div>
+                    <div class="siap-card-title">Lakukan Hal-Hal Kecil yang Positif</div>
+                  </div>
+                  <ul class="siap-list">
+                    <li><span class="siap-list-check">&#10003;</span>Bangun pagi, bereskan tempat tidur</li>
+                    <li><span class="siap-list-check">&#10003;</span>Jangan telat masuk kelas. Duduk di depan</li>
+                    <li><span class="siap-list-check">&#10003;</span>Kerjakan tugas</li>
+                    <li><span class="siap-list-check">&#10003;</span>Buang sampah pada tempatnya serta sapu dan pel lantai</li>
+                    <li><span class="siap-list-check">&#10003;</span>Mandi, keramas, dan sikat gigi</li>
+                    <li><span class="siap-list-check">&#10003;</span>Baca berita, jangan hanya gosip: Melek sosial politik</li>
+                    <li><span class="siap-list-check">&#10003;</span>Beri pendapat, dengarkan saran</li>
+                    <li><span class="siap-list-check">&#10003;</span>Menulis. Baca buku</li>
+                    <li><span class="siap-list-check">&#10003;</span>Jangan telat makan</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <section class="slide slide-alumni" id="slide-7">
+          <div class="slide-content">
+
+            <div class="slide-header">
+              <span class="section-tag">Lulusan Kami</span>
+              <h2 class="section-title">Jejak <span class="gold">Alumni TRM</span> di Industri</h2>
+              <p class="section-lead">
+                Tempat kerja dan posisi yang digeluti lulusan TRM di berbagai industri
+                kreatif dan teknologi. Dilacak lewat akun LinkedIn.
+              </p>
+            </div>
+
+            <div class="alu-grid">
+              <div class="alu-companies">
+                <div class="alu-cat-card">
+                  <div class="alu-cat-head">
+                    <div class="alu-cat-icon">&#127918;</div>
+                    <div class="alu-cat-label">Games</div>
+                  </div>
+                  <div class="alu-cat-chips">
+                    <span class="alu-chip">Dunia Games</span>
+                    <span class="alu-chip">Gameloft</span>
+                    <span class="alu-chip">Jagad Creative</span>
+                    <span class="alu-chip">Ariverse</span>
+                  </div>
+                </div>
+
+                <div class="alu-cat-card">
+                  <div class="alu-cat-head">
+                    <div class="alu-cat-icon">&#128250;</div>
+                    <div class="alu-cat-label">Media</div>
+                  </div>
+                  <div class="alu-cat-chips">
+                    <span class="alu-chip">TvOne</span>
+                    <span class="alu-chip">TransTV</span>
+                    <span class="alu-chip">CNBC</span>
+                  </div>
+                </div>
+
+                <div class="alu-cat-card">
+                  <div class="alu-cat-head">
+                    <div class="alu-cat-icon">&#127981;</div>
+                    <div class="alu-cat-label">Banking</div>
+                  </div>
+                  <div class="alu-cat-chips">
+                    <span class="alu-chip">Mandiri</span>
+                    <span class="alu-chip">BRI</span>
+                    <span class="alu-chip">BNI</span>
+                    <span class="alu-chip">MayBank</span>
+                    <span class="alu-chip">CIMB</span>
+                  </div>
+                </div>
+
+                <div class="alu-cat-card">
+                  <div class="alu-cat-head">
+                    <div class="alu-cat-icon">&#128225;</div>
+                    <div class="alu-cat-label">Telco</div>
+                  </div>
+                  <div class="alu-cat-chips">
+                    <span class="alu-chip">Telkom</span>
+                  </div>
+                </div>
+
+                <div class="alu-cat-card">
+                  <div class="alu-cat-head">
+                    <div class="alu-cat-icon">&#127760;</div>
+                    <div class="alu-cat-label">Others</div>
+                  </div>
+                  <div class="alu-cat-chips">
+                    <span class="alu-chip">Traveloka</span>
+                    <span class="alu-chip">EdgeProp Sing.</span>
+                    <span class="alu-chip">Astra</span>
+                  </div>
+                </div>
+
+                <div class="alu-cat-card">
+                  <div class="alu-cat-head">
+                    <div class="alu-cat-icon">&#128161;</div>
+                    <div class="alu-cat-label">Entrepreneurial</div>
+                  </div>
+                  <div class="alu-cat-chips">
+                    <span class="alu-chip">Cube Studio</span>
+                    <span class="alu-chip">Mateha</span>
+                    <span class="alu-chip">Lunar Interactive</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="alu-position-panel">
+                <div class="alu-position-head">
+                  <div class="alu-cat-icon">&#128188;</div>
+                  <div class="siap-card-title">Posisi Kerja Alumni</div>
+                </div>
+                <ul class="alu-position-list">
+                  <li><span class="alu-position-num">01</span>Graphic Designer / Illustrator</li>
+                  <li><span class="alu-position-num">02</span>Video Editor</li>
+                  <li><span class="alu-position-num">03</span>Back / Front / Full Stack Developer</li>
+                  <li><span class="alu-position-num">04</span>Data Scientist / Analyst</li>
+                  <li><span class="alu-position-num">05</span>Game / AR / VR Developer, Designer &amp; Artist</li>
+                  <li><span class="alu-position-num">06</span>UI / UX Designer</li>
+                  <li><span class="alu-position-num">07</span>Content Creator</li>
+                  <li><span class="alu-position-num">08</span>3D Modeler / Designer / Animator</li>
+                  <li><span class="alu-position-num">09</span>Social Media Specialist</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <section class="slide slide-tracer" id="slide-8">
+          <div class="slide-content">
+
+            <div class="slide-header">
+              <span class="section-tag">Alumni TRM</span>
+              <h2 class="section-title">Tracer Study: Jejak <span class="gold">Karier Lulusan</span></h2>
+              <p class="section-lead">
+                Data lulusan TRM dari tracer study tahunan — gambaran nyata seberapa
+                cepat dan seberapa siap alumni terserap dunia kerja.
+              </p>
+            </div>
+
+            <div class="tracer-body">
+              <div class="tracer-kpis">
+                <div class="tracer-kpi">
+                  <div class="tracer-kpi-icon">&#128188;</div>
+                  <div class="tracer-kpi-value">78,8%</div>
+                  <div class="tracer-kpi-label">Lulusan Bekerja &lt; 1 Tahun</div>
+                </div>
+
+                <div class="tracer-kpi">
+                  <div class="tracer-kpi-icon">&#128640;</div>
+                  <div class="tracer-kpi-value">3,9%</div>
+                  <div class="tracer-kpi-label">Lulusan Berwirausaha</div>
+                </div>
+
+                <div class="tracer-kpi">
+                  <div class="tracer-kpi-icon">&#9203;</div>
+                  <div class="tracer-kpi-value">2,07 bulan</div>
+                  <div class="tracer-kpi-label">Rata-rata Masa Tunggu Kerja</div>
+                </div>
+
+                <div class="tracer-kpi">
+                  <div class="tracer-kpi-icon">&#128176;</div>
+                  <div class="tracer-kpi-value">Rp 5.037.000</div>
+                  <div class="tracer-kpi-label">Rata-rata Pendapatan Pertama</div>
+                </div>
+              </div>
+
+              <div class="tracer-charts-row">
+                <div class="tracer-trend-panel">
+                  <div class="tracer-trend-head">
+                    <div class="tracer-trend-title">Tren Keterserapan Kerja Lulusan</div>
+                    <div class="tracer-trend-sub">% lulusan yang bekerja, per tahun kelulusan</div>
+                  </div>
+                  <div class="tracer-chart">
+                    <div class="tracer-col">
+                      <div class="tracer-col-value">64,8%</div>
+                      <div class="tracer-col-bar" style="height:117px"></div>
+                      <div class="tracer-col-year">2020+2021</div>
+                    </div>
+                    <div class="tracer-col">
+                      <div class="tracer-col-value">63,5%</div>
+                      <div class="tracer-col-bar" style="height:114px"></div>
+                      <div class="tracer-col-year">2022</div>
+                    </div>
+                    <div class="tracer-col">
+                      <div class="tracer-col-value">76,6%</div>
+                      <div class="tracer-col-bar" style="height:138px"></div>
+                      <div class="tracer-col-year">2023</div>
+                    </div>
+                    <div class="tracer-col">
+                      <div class="tracer-col-value">78,8%</div>
+                      <div class="tracer-col-bar" style="height:142px"></div>
+                      <div class="tracer-col-year">2024</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tracer-profile-panel">
+                  <div class="tracer-trend-head">
+                    <div class="tracer-trend-title">Profil Karier Lulusan 2024</div>
+                    <div class="tracer-trend-sub">jenis perusahaan &amp; relevansi kerja</div>
+                  </div>
+
+                  <div class="tracer-profile-row">
+                    <div class="tracer-profile-label">Jenis Perusahaan</div>
+                    <div class="tracer-profile-bar">
+                      <div class="tracer-profile-seg tracer-seg-1" style="width:80.5%"></div>
+                      <div class="tracer-profile-seg tracer-seg-2" style="width:19.5%"></div>
+                    </div>
+                    <div class="tracer-profile-legend">
+                      <span><i class="tracer-dot tracer-seg-1"></i>Lokal &amp; Nasional 80,5%</span>
+                      <span><i class="tracer-dot tracer-seg-2"></i>Multinasional 19,5%</span>
+                    </div>
+                  </div>
+
+                  <div class="tracer-profile-row">
+                    <div class="tracer-profile-label">Keeratan dengan Keilmuan Prodi</div>
+                    <div class="tracer-profile-bar">
+                      <div class="tracer-profile-seg tracer-seg-1" style="width:58.5%"></div>
+                      <div class="tracer-profile-seg tracer-seg-2" style="width:31.7%"></div>
+                      <div class="tracer-profile-seg tracer-seg-3" style="width:9.8%"></div>
+                    </div>
+                    <div class="tracer-profile-legend">
+                      <span><i class="tracer-dot tracer-seg-1"></i>Sangat Erat/Erat 58,5%</span>
+                      <span><i class="tracer-dot tracer-seg-2"></i>Cukup Erat 31,7%</span>
+                      <span><i class="tracer-dot tracer-seg-3"></i>Kurang Erat 9,8%</span>
+                    </div>
+                  </div>
+
+                  <div class="tracer-profile-row">
+                    <div class="tracer-profile-label">Kesesuaian Tingkat Pendidikan</div>
+                    <div class="tracer-profile-bar">
+                      <div class="tracer-profile-seg tracer-seg-1" style="width:97.6%"></div>
+                      <div class="tracer-profile-seg tracer-seg-2" style="width:2.4%"></div>
+                    </div>
+                    <div class="tracer-profile-legend">
+                      <span><i class="tracer-dot tracer-seg-1"></i>Tingkat Sama 97,6%</span>
+                      <span><i class="tracer-dot tracer-seg-2"></i>Lebih Tinggi 2,4%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <section class="slide slide-aset" id="slide-9">
+          <div class="slide-content">
+
+            <div class="slide-header">
+              <span class="section-tag">Mindset Mahasiswa</span>
+              <h2 class="section-title">Kuliah adalah <span class="gold">Investasi</span></h2>
+              <p class="section-lead">
+                 Aset paling berharga dari setiap orang adalah waktu dan tenaga.
+                 Target akhir perjuangan ini adalah agar kita tidak perlu
+                 menukar lagi keduanya untuk bertahan hidup.
+              </p>
+            </div>
+
+            <div class="aset-body">
+              <div class="aset-eq-row">
+                <div class="aset-eq-tag">Masa<br>Kuliah</div>
+                <div class="aset-eq-flow">
+                  <div class="aset-term">
+                    <div class="aset-term-icon">&#9203;</div>
+                    <div class="aset-term-label">Waktu</div>
+                  </div>
+                  <div class="aset-op">+</div>
+                  <div class="aset-term">
+                    <div class="aset-term-icon">&#128170;</div>
+                    <div class="aset-term-label">Tenaga</div>
+                  </div>
+                  <div class="aset-op">+</div>
+                  <div class="aset-term">
+                    <div class="aset-term-icon">&#128176;</div>
+                    <div class="aset-term-label">Uang</div>
+                  </div>
+                  <div class="aset-arrow">&#8594;</div>
+                  <div class="aset-term aset-term-highlight">
+                    <div class="aset-term-icon">&#129504;</div>
+                    <div class="aset-term-label">Skill</div>
+                  </div>
+                </div>
+                <div class="aset-inline-insight">
+                  &#127942; Gunakan <strong>waktu</strong>, <strong>tenaga</strong>, dan <strong>uang</strong> yang sudah digunakan untuk mencapai skill di level master.
+                </div>
+              </div>
+
+              <div class="aset-eq-row aset-eq-row-kerja">
+                <div class="aset-eq-tag">Masa<br>Bekerja</div>
+                <div class="aset-eq-flow">
+                  <div class="aset-term">
+                    <div class="aset-term-icon">&#9203;</div>
+                    <div class="aset-term-label">Waktu</div>
+                  </div>
+                  <div class="aset-op">+</div>
+                  <div class="aset-term">
+                    <div class="aset-term-icon">&#128170;</div>
+                    <div class="aset-term-label">Tenaga</div>
+                  </div>
+                  <div class="aset-op">+</div>
+                  <div class="aset-term">
+                    <div class="aset-term-icon">&#129504;</div>
+                    <div class="aset-term-label">Skill</div>
+                  </div>
+                  <div class="aset-arrow">&#8594;</div>
+                  <div class="aset-term aset-term-highlight">
+                    <div class="aset-term-icon">&#128176;</div>
+                    <div class="aset-term-label">Uang</div>
+                  </div>
+                </div>
+                <div class="aset-inline-insight">
+                  &#128161; Waktu dan tenaga relatif sama untuk setiap orang — <strong>skill</strong>-lah yang membedakan besar-kecilnya hasil.
+                </div>
+              </div>
+
+              <div class="aset-eq-row aset-eq-row-tuai">
+                <div class="aset-eq-tag">Masa<br>Tuai</div>
+                <div class="aset-eq-flow">
+                  <div class="aset-term">
+                    <div class="aset-term-icon">&#128176;</div>
+                    <div class="aset-term-label">Uang</div>
+                  </div>
+                  <div class="aset-op">+</div>
+                  <div class="aset-term">
+                    <div class="aset-term-icon">&#129504;</div>
+                    <div class="aset-term-label">Skill</div>
+                  </div>
+                  <div class="aset-arrow">&#8594;</div>
+                  <div class="aset-term aset-term-highlight">
+                    <div class="aset-term-icon">&#9203;</div>
+                    <div class="aset-term-label">Waktu</div>
+                  </div>
+                  <div class="aset-op">+</div>
+                  <div class="aset-term aset-term-highlight">
+                    <div class="aset-term-icon">&#128170;</div>
+                    <div class="aset-term-label">Tenaga</div>
+                  </div>
+                </div>
+                <div class="aset-inline-insight">
+                  &#127806; Uang yang diinvestasikan dan skill yang dimiliki
+                   membuat kamu mendapatkan kembali kendali penuh atas dua aset
+                  yang paling berharga, yaitu <strong>tenaga</strong> dan <strong>waktu</strong>.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <section class="slide slide-closing" id="slide-10">
+
+          <div class="title-watermark">26</div>
+
+          <div class="title-topbar">
+            <img src="gambar/logo-trm.png" alt="Logo TRM" class="title-logo-img" />
+            <span class="title-eyebrow-pill"><span class="dot"></span>PKKMB 2026 · TRM</span>
+          </div>
+
+          <div class="closing-main">
+            <div class="closing-kicker">
+              <div class="title-kicker-line"></div>
+              <span class="title-kicker-text">Program Studi S1 Terapan  Teknologi Rekayasa Multimedia</span>
+            </div>
+
+            <h1 class="closing-h1">Terima <span class="gold">Kasih!</span></h1>
+
+            <div class="title-divider"></div>
+
+            <p class="closing-sub">
+              Selamat <strong>belajar</strong>, <strong>tumbuh</strong>, dan <strong>berkembang</strong>.
+            </p>
+
+            <div class="closing-enjoy">Enjoy the Journey</div>
+          </div>
+
+          <div class="title-footer">
+            <div class="title-footer-left"><b>Fakultas Ilmu Terapan</b> · Universitas Telkom</div>
+            <div class="title-footer-right">Bandung, 08 September 2026</div>
+          </div>
+
+        </section>
+
+        <!-- Halaman berikutnya akan ditambahkan di sini -->
+
+      </div>
+
+      <!-- ============ NAVIGASI HALAMAN ============ -->
+      <div class="deck-nav" id="deckNav"></div>
+
+    </div>
+  </div>
+
+<script>
+  (function(){
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const nav = document.getElementById('deckNav');
+
+    function goTo(index){
+      slides.forEach((s, i) => s.classList.toggle('active', i === index));
+      Array.from(nav.children).forEach((b, i) => b.classList.toggle('active', i === index));
+    }
+
+    slides.forEach((s, i) => {
+      const box = document.createElement('div');
+      box.className = 'nav-box';
+      box.textContent = String(i + 1).padStart(2, '0');
+      box.addEventListener('click', () => goTo(i));
+      nav.appendChild(box);
+    });
+
+    goTo(0);
+
+    document.addEventListener('keydown', (e) => {
+      const current = slides.findIndex(s => s.classList.contains('active'));
+      if (e.key === 'ArrowRight' && current < slides.length - 1) goTo(current + 1);
+      if (e.key === 'ArrowLeft'  && current > 0) goTo(current - 1);
+
+      if (/^[0-9]$/.test(e.key)) {
+        const index = e.key === '0' ? 9 : Number(e.key) - 1;
+        if (index < slides.length) goTo(index);
+      }
+    });
+
+    // Fit 16:9 deck to viewport
+    const deck = document.getElementById('deck');
+    function fit(){
+      const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+      deck.style.transform = `scale(${scale})`;
+    }
+    fit();
+    window.addEventListener('resize', fit);
+
+    // CPL list (slide 4) — hover/klik untuk menampilkan deskripsi
+    const cplItems = document.querySelectorAll('.cpl-item');
+    const cplDetailNum = document.getElementById('cplDetailNum');
+    const cplDetailTitle = document.getElementById('cplDetailTitle');
+    const cplDetailDesc = document.getElementById('cplDetailDesc');
+
+    function setCpl(item){
+      cplItems.forEach(i => i.classList.toggle('active', i === item));
+      cplDetailNum.textContent = item.querySelector('.cpl-num').textContent;
+      cplDetailTitle.textContent = item.querySelector('.cpl-title').textContent;
+      cplDetailDesc.textContent = item.dataset.desc;
+    }
+
+    cplItems.forEach(item => {
+      item.addEventListener('click', () => setCpl(item));
+    });
+
+    // Tab profil-software (slide 5)
+    const curTabs = document.querySelectorAll('.cur-tab');
+    const curPanels = document.querySelectorAll('.cur-tab-panel');
+
+    curTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        curTabs.forEach(t => t.classList.toggle('active', t === tab));
+        curPanels.forEach(p => p.classList.toggle('active', p.dataset.panel === tab.dataset.tab));
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
