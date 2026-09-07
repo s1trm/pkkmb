@@ -2089,14 +2089,14 @@
                 <text x="37" y="341" class="cur-note-item" style="font-size:14px">2. Rekognisi</text>
 
                 <!-- kelulusan -->
-                <text x="385" y="440" text-anchor="middle" class="cur-final">Lulus jika Nilai CPMK &gt; 50</text>
+                <text x="385" y="440" text-anchor="middle" class="cur-final">Lulus jika nilai CPMK &gt; 50</text>
               </svg>
             </div>
 
             <div class="cur-tabs-panel">
               <div class="cur-tabs" id="curTabs">
                 <button class="cur-tab active" data-tab="developer">Developer</button>
-                <button class="cur-tab" data-tab="konten-kreator">Konten Kreator</button>
+                <button class="cur-tab" data-tab="konten-kreator">Content Creator</button>
                 <button class="cur-tab" data-tab="technopreneur">Technopreneur</button>
               </div>
 
@@ -2119,7 +2119,7 @@
                     <div class="cur-course-item">Pemrograman Web</div>
                     <div class="cur-course-item">Pemrograman Game</div>
                     <div class="cur-course-item">Pemrograman Mobile</div>
-                    <div class="cur-course-item">Pemrograman Mikro</div>
+                    <div class="cur-course-item">Pemrograman Microcontroller</div>
                     <div class="cur-course-item">Artificial Intelligence</div>
                     <div class="cur-course-item">AR/VR</div>
                   </div>
@@ -2156,6 +2156,7 @@
                     <div class="cur-course-item">Inovasi Bisnis TIK</div>
                     <div class="cur-course-item">Jaringan Pelanggan Bisnis TIK</div>
                     <div class="cur-course-item">Kewirausahaan</div>
+                    <div class="cur-course-item">Tugas Akhir (Jalur Startup)</div>
                   </div>
                 </div>
               </div>
@@ -2174,7 +2175,7 @@
               <span class="section-tag">Persiapan Diri</span>
               <h2 class="section-title">Siap Memasuki <span class="gold">Dunia Nyata</span></h2>
               <p class="section-lead">
-                 Jika dirangkum, inilah
+                 Jika dirangkum, inilah bekal yang harus dimiliki saat lulus nanti.
               </p>
             </div>
 
@@ -2332,7 +2333,7 @@
                   <li><span class="alu-position-num">03</span>Back / Front / Full Stack Developer</li>
                   <li><span class="alu-position-num">04</span>Data Scientist / Analyst</li>
                   <li><span class="alu-position-num">05</span>Game / AR / VR Developer, Designer &amp; Artist</li>
-                  <li><span class="alu-position-num">06</span>UI / UX Designer</li>
+                  <li><span class="alu-position-num">06</span>UI/UX Designer</li>
                   <li><span class="alu-position-num">07</span>Content Creator</li>
                   <li><span class="alu-position-num">08</span>3D Modeler / Designer / Animator</li>
                   <li><span class="alu-position-num">09</span>Social Media Specialist</li>
@@ -2631,8 +2632,9 @@
 
     document.addEventListener('keydown', (e) => {
       const current = slides.findIndex(s => s.classList.contains('active'));
-      if (e.key === 'ArrowRight' && current < slides.length - 1) goTo(current + 1);
-      if (e.key === 'ArrowLeft'  && current > 0) goTo(current - 1);
+
+      if ((e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') && current < slides.length - 1) goTo(current + 1);
+      if ((e.key === 'ArrowLeft'  || e.key === 'ArrowUp'   || e.key === 'PageUp')   && current > 0) goTo(current - 1);
 
       if (/^[0-9]$/.test(e.key)) {
         const index = e.key === '0' ? 9 : Number(e.key) - 1;
